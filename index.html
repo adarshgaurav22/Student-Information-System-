@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Record System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>Student Information System(SIS)</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-page="dashboard">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </li>
+                <li data-page="students">
+                    <span class="icon">👥</span>
+                    Students
+                </li>
+                <li data-page="attendance">
+                    <span class="icon">📅</span>
+                    Attendance
+                </li>
+                <li data-page="performance">
+                    <span class="icon">📈</span>
+                    Performance
+                </li>
+                <li data-page="notices">
+                    <span class="icon">📢</span>
+                    Notices
+                </li>
+            </ul>
+            <div class="theme-toggle">
+                <button id="themeToggle">🌙 Dark Mode</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search students...">
+                    <button>🔍</button>
+                </div>
+                <div class="user-info">
+                    <link rel="stylesheet" href="login.html">
+                    <span class="user-name">Adarsh singh</span>
+                    <span class="user-role">Admin</span>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard">
+                <h1>Dashboard</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Students</h3>
+                        <p class="stat-number">25</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Average Attendance</h3>
+                        <p class="stat-number">85%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Performance</h3>
+                        <p class="stat-number">B+</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Courses</h3>
+                        <p class="stat-number">12</p>
+                    </div>
+                </div>
+                <div class="charts-container">
+                    <div class="chart">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                    <div class="chart">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Page -->
+            <div class="page" id="students">
+                <h1>Students</h1>
+                <div class="actions">
+                    <button class="btn primary" onclick="showAddStudentModal()">Add New Student</button>
+                    <div class="filters">
+                        <select id="classFilter">
+                            <option value="">All Classes</option>
+                            <option value="10">Class 10</option>
+                            <option value="11">Class 11</option>
+                            <option value="12">Class 12</option>
+                        </select>
+                        <select id="sortFilter">
+                            <option value="name">Sort by Name</option>
+                            <option value="roll">Sort by Roll No</option>
+                            <option value="performance">Sort by Performance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="students-grid" id="studentsGrid">
+                    <!-- Student cards will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Attendance Page -->
+            <div class="page" id="attendance">
+                <h1>Attendence</h1>
+                <div class="attendance-container">
+                    <div class="date-selector">
+                        <button onclick="previousDate()">←</button>
+                        <h2 id="currentDate"></h2>
+                        <button onclick="nextDate()">→</button>
+                    </div>
+                    <div class="attendance-list" id="attendanceList">
+                        <!-- Attendance records will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Page -->
+            <div class="page" id="performance">
+                <h1>Performance Analytics</h1>
+                <div class="performance-filters">
+                    <select id="subjectFilter">
+                        <option value="">All Subjects</option>
+                        <option value="math">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="english">English</option>
+                    </select>
+                    <select id="termFilter">
+                        <option value="">All Terms</option>
+                        <option value="term1">Term 1</option>
+                        <option value="term2">Term 2</option>
+                        <option value="final">Final</option>
+                    </select>
+                </div>
+                <div class="performance-grid" id="performanceGrid">
+                    <!-- Performance cards will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Notices Page -->
+            <div class="page" id="notices">
+                <h1>Notice Board</h1>
+                <div class="notice-actions">
+                    <button class="btn primary" onclick="showAddNoticeModal()">Post Notice</button>
+                </div>
+                <div class="notices-container" id="noticesContainer">
+                    <!-- Notices will be dynamically added here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal" id="addStudentModal">
+        <div class="modal-content">
+            <h2>Add New Student</h2>
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Roll Number</label>
+                    <input type="text" name="roll" required>
+                </div>
+                <div class="form-group">
+                    <label>Class</label>
+                    <select name="class" required>
+                        <option value="10">Class 10</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Parent's Contact</label>
+                    <input type="tel" name="contact">
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal('addStudentModal')">Cancel</button>
+                    <button type="submit" class="primary">Add Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Notice Modal -->
+    <div class="modal" id="addNoticeModal">
+        <div class="modal-content">
+            <h2>Post New Notice</h2>
+            <form id="addNoticeForm">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Content</label>
+                    <textarea name="content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority</label>
+                    <select name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal('addNoticeModal')">Cancel</button>
+                    <button type="submit" class="primary">Post Notice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+import React, { useState, useEffect } from 'react';
+import { Clock, Timer, Globe2, Moon, Sun, Settings } from 'lucide-react';
+
+type Theme = 'light' | 'dark' | 'nature' | 'tech';
+type Mode = 'clock' | 'stopwatch' | 'worldtime';
+
+function App() {
+  const [time, setTime] = useState(new Date());
+  const [theme, setTheme] = useState<Theme>('light');
+  const [mode, setMode] = useState<Mode>('clock');
+  const [isRunning, setIsRunning] = useState(false);
+  const [stopwatchTime, setStopwatchTime] = useState(0);
+
+  // Update clock
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Stopwatch logic
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setStopwatchTime(prev => prev + 10);
+      }, 10);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  const getThemeBackground = () => {
+    switch (theme) {
+      case 'dark':
+        return 'bg-gray-900';
+      case 'nature':
+        return 'bg-[url(https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&q=80)]';
+      case 'tech':
+        return 'bg-gradient-to-r from-blue-900 via-black to-purple-900';
+      default:
+        return 'bg-gray-100';
+    }
+  };
+
+  const getThemeText = () => {
+    return theme === 'dark' ? 'text-white' : 'text-gray-900';
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour12: true,
+      hour: 'numeric',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
+
+  const formatStopwatch = (ms: number) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    const milliseconds = Math.floor((ms % 1000) / 10);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className={`min-h-screen ${getThemeBackground()} bg-cover bg-center transition-all duration-500`}>
+      <div className="min-h-screen backdrop-blur-sm bg-black/30 flex flex-col items-center">
+        {/* Navigation */}
+        <nav className="w-full p-4 backdrop-blur-md bg-white/10">
+          <div className="max-w-4xl mx-auto flex justify-between items-center">
+            <div className="flex gap-4">
+              <button
+                onClick={() => setMode('clock')}
+                className={`p-2 rounded-lg ${mode === 'clock' ? 'bg-white/20' : 'hover:bg-white/10'}`}
+              >
+                <Clock className="w-6 h-6 text-white" />
+              </button>
+              <button
+                onClick={() => setMode('stopwatch')}
+                className={`p-2 rounded-lg ${mode === 'stopwatch' ? 'bg-white/20' : 'hover:bg-white/10'}`}
+              >
+                <Timer className="w-6 h-6 text-white" />
+              </button>
+              <button
+                onClick={() => setMode('worldtime')}
+                className={`p-2 rounded-lg ${mode === 'worldtime' ? 'bg-white/20' : 'hover:bg-white/10'}`}
+              >
+                <Globe2 className="w-6 h-6 text-white" />
+              </button>
+            </div>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-lg hover:bg-white/10"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-6 h-6 text-white" />
+                ) : (
+                  <Moon className="w-6 h-6 text-white" />
+                )}
+              </button>
+              <button
+                onClick={() => setTheme(theme === 'nature' ? 'light' : 'nature')}
+                className="p-2 rounded-lg hover:bg-white/10"
+              >
+                <Settings className="w-6 h-6 text-white" />
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        {/* Main Content */}
+        <main className="flex-1 w-full max-w-4xl mx-auto p-8 flex flex-col items-center justify-center">
+          {mode === 'clock' && (
+            <div className="text-center">
+              <h1 className="text-8xl font-bold text-white mb-4 font-mono">
+                {formatTime(time)}
+              </h1>
+              <p className="text-2xl text-white/80">
+                {time.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            </div>
+          )}
+
+          {mode === 'stopwatch' && (
+            <div className="text-center">
+              <h2 className="text-8xl font-bold text-white mb-8 font-mono">
+                {formatStopwatch(stopwatchTime)}
+              </h2>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setIsRunning(!isRunning)}
+                  className="px-8 py-3 rounded-lg bg-white/20 hover:bg-white/30 text-white font-semibold"
+                >
+                  {isRunning ? 'Stop' : 'Start'}
+                </button>
+                <button
+                  onClick={() => setStopwatchTime(0)}
+                  className="px-8 py-3 rounded-lg bg-white/20 hover:bg-white/30 text-white font-semibold"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          )}
+
+          {mode === 'worldtime' && (
+            <div className="grid grid-cols-2 gap-8 w-full">
+              {[
+                { city: 'New York', offset: -4 },
+                { city: 'London', offset: 1 },
+                { city: 'Tokyo', offset: 9 },
+                { city: 'Sydney', offset: 10 },
+              ].map(({ city, offset }) => (
+                <div key={city} className="bg-white/10 rounded-lg p-6">
+                  <h3 className="text-xl text-white/80 mb-2">{city}</h3>
+                  <p className="text-3xl text-white font-mono">
+                    {formatTime(new Date(time.getTime() + offset * 60 * 60 * 1000))}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+export default App
